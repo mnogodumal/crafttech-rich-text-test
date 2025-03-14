@@ -1,45 +1,63 @@
-import { useState } from "react";
-import { Layer, Stage } from "react-konva";
-import Shape from "../shape/Shape";
+import Konva from 'konva'
+import { useRef, useState } from 'react'
+import { Layer, Stage } from 'react-konva'
 
-const Canvas = ({ tool, stageRef }: any) => {
-  const [figures, setFigures] = useState<any>([]);
+import type { CanvasModes, CanvasObjectPosition } from '../../types'
+import { isEditingMode } from '../../utils/is-mode'
+import Shape from '../shape/Shape'
 
-  const handleOnClick = (e: any) => {
-    if (tool === "cursor") return;
-    const stage = e.target.getStage();
-    const stageOffset = stage.absolutePosition();
-    const point = stage.getPointerPosition();
-    setFigures((prev: any) => [
+export interface CanvasProps {
+  mode: CanvasModes
+}
+
+export default function Canvas({ mode }: CanvasProps) {
+  const [figures, setFigures] = useState<CanvasObjectPosition[]>([])
+  const stageRef = useRef<Konva.Stage>(null)
+
+  const isDraggable = isEditingMode(mode)
+
+  const drawShape = () => {
+    if (!stageRef.current) {
+      console.error('drawShape: Stage Ref is not defined')
+      return
+    }
+
+    const stage = stageRef.current!.getStage()
+
+    const stageOffset = stage.absolutePosition() || { x: 0, y: 0 }
+    const point = stage.getPointerPosition() || { x: 0, y: 0 }
+
+    setFigures((prev: CanvasObjectPosition[]) => [
       ...prev,
       {
         id: Date.now().toString(36),
-        width: 100,
-        height: 100,
-        type: "rect",
+        width: 150,
+        height: 150,
         x: point.x - stageOffset.x,
-        y: point.y - stageOffset.y,
-        html: "",
-        text: "",
-      },
-    ]);
-  };
+        y: point.y - stageOffset.y
+      }
+    ])
+  }
+
+  const handleOnClick = () => {
+    if (isDraggable) return
+
+    drawShape()
+  }
 
   return (
     <Stage
+      ref={stageRef}
       width={window.innerWidth}
       height={window.innerHeight}
-      draggable={tool === "cursor"}
+      draggable={isDraggable}
       onClick={handleOnClick}
-      ref={stageRef}
     >
       <Layer>
-        {figures.map((figure: any, i: number) => {
-          return <Shape key={i} {...figure} stageRef={stageRef} tool={tool} />;
+        {figures.map((figure: CanvasObjectPosition) => {
+          return <Shape key={figure.id} {...figure} mode={mode} />
         })}
       </Layer>
     </Stage>
-  );
-};
-
-export default Canvas;
+  )
+}

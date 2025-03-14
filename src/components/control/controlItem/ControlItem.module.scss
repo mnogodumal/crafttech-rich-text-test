@@ -1,0 +1,42 @@
+.root {
+  max-width: max-content;
+  margin-bottom: 10px;
+  border: 1px solid #d8d8d8;
+  border-radius: 5px;
+  
+  background-color: #eff1f8;
+
+  color: #555555;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: .15s all ease;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &.checked {
+    background-color: #4857ff;
+    color: #fff;
+    border-color: #2f3feb;
+  }
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+  
+  padding: 7px 12px;
+  padding-left: 8px;
+
+  cursor: pointer;
+}
+
+.input {
+  cursor: pointer;
+}

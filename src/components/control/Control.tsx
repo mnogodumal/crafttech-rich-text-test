@@ -1,35 +1,39 @@
-const Control = ({ tool, setTool }: any) => {
-  const handleOnChange = (e: any) => {
-    setTool(e.target.value);
-  };
+import { CANVAS_MODE_KEYS, type CanvasModes } from '../../types'
+import { isAddingMode, isEditingMode } from '../../utils/is-mode'
+import styles from './Control.module.scss'
+import ControlItem from './controlItem/ControlItem'
 
+export interface ControlProps {
+  mode: CanvasModes
+  setMode: (e: CanvasModes) => void
+}
+
+const CONTROL_ITEMS = [
+  {
+    itemMode: CANVAS_MODE_KEYS.EDITING,
+    label: 'Взаимодействие',
+    isActiveComparator: (mode: CanvasModes) => isEditingMode(mode)
+  },
+  {
+    itemMode: CANVAS_MODE_KEYS.ADDING,
+    label: 'Добавление',
+    isActiveComparator: (mode: CanvasModes) => isAddingMode(mode)
+  }
+]
+
+export default function Control({ mode, setMode }: ControlProps) {
   return (
-    <div style={{ position: "absolute", top: 0 }}>
-      <div>
-        <input
-          type="radio"
-          id="cursor"
-          name="control"
-          value="cursor"
-          checked={tool === "cursor"}
-          onChange={handleOnChange}
+    <div className={styles.root}>
+      {CONTROL_ITEMS.map(control => (
+        <ControlItem
+          key={control.itemMode}
+          htmlFor={control.itemMode}
+          value={control.itemMode}
+          checked={control.isActiveComparator(mode)}
+          label={control.label}
+          onChange={() => setMode(control.itemMode)}
         />
-        <label htmlFor="cursor">Взаимодействие</label>
-      </div>
-
-      <div>
-        <input
-          type="radio"
-          id="shape"
-          name="control"
-          value="shape"
-          checked={tool === "shape"}
-          onChange={handleOnChange}
-        />
-        <label htmlFor="shape">Добавление</label>
-      </div>
+      ))}
     </div>
-  );
-};
-
-export default Control;
+  )
+}
